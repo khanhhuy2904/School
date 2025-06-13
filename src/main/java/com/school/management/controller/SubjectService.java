@@ -14,4 +14,7 @@ public interface SubjectService {
     void edit(Subject subject);
 
     void deleteByCode(String code);
+    void assignTeacherToSubject(String subjectCode, String teacherCode);
+    void assignStudentsToSubject(String subjectCode, List<String> studentCodes);
+    void close();
 }

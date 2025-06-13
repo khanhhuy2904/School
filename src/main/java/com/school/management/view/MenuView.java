@@ -6,6 +6,7 @@ import com.school.management.model.Student;
 import com.school.management.model.Subject;
 import com.school.management.model.Teacher;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -167,7 +168,20 @@ public class MenuView {
                     break;
                 }
                 case Constants.SHOW_LIST_SUBJECT: {
-                    System.out.println(subjectService.getAll());
+                    try {
+                        List<Subject> subjects = subjectService.getAll();
+                        for (Subject s : subjects) {
+                            System.out.printf("Code: %s, Name: %s, Credit: %d, Max: %d, Teacher: %s\n",
+                                    s.getCodeSubject(),
+                                    s.getNameSubject(),
+                                    s.getCredit(),
+                                    s.getMaxStudent(),
+                                    s.getTeacher() != null ? s.getTeacher().getNameTeacher() : "N/A"
+                            );
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Error loading subjects: " + e.getMessage());
+                    }
                     break;
                 }
                 case Constants.GET_DETAIL_SUBJECT: {
@@ -185,6 +199,8 @@ public class MenuView {
                 }
                 case Constants.CREATE_SUBJECT: {
                     Subject subject = subjectView.screenCreateSubject();
+                    String code = String.format("MH%05d", System.currentTimeMillis() % 100000);
+                    subject.setCodeSubject(code);
                     try {
                         subjectService.create(subject);
                     } catch (Exception ex) {
@@ -218,16 +234,48 @@ public class MenuView {
                     break;
                 }
                 case Constants.ASSIGN_TEACHER_TO_SUBJECT: {
-                    subjectView.assignTeacherToSubject();
+                    sc.nextLine();
+                    System.out.print("Enter subject code: ");
+                    String subjectCode = sc.nextLine();
+
+                    System.out.print("Enter teacher code: ");
+                    String teacherCode = sc.nextLine();
+
+                    try {
+                        subjectService.assignTeacherToSubject(subjectCode, teacherCode);
+                    } catch (IllegalStateException ex) {
+                        System.out.println(ex.getMessage());
+                    } catch (Exception ex) {
+                        System.out.println("Error: " + ex.getMessage());
+                    }
                     break;
                 }
                 case Constants.ADD_STUDENTS_TO_SUBJECT: {
-                    subjectView.addStudentsToSubject();
+                    sc.nextLine();
+                    System.out.print("Enter subject code: ");
+                    String subjectCode = sc.nextLine();
+
+                    List<String> studentCodes = new ArrayList<>();
+                    System.out.println("Enter student codes to add (type 'x' to finish):");
+                    while (true) {
+                        System.out.print("→ ");
+                        String input = sc.nextLine();
+                        if (input.equalsIgnoreCase("x")) break;
+                        studentCodes.add(input);
+                    }
+                    try {
+                        subjectService.assignStudentsToSubject(subjectCode, studentCodes);
+                    } catch (Exception ex) {
+                        System.out.println("Error: " + ex.getMessage());
+                    }
                     break;
                 }
                 default:
             }
         }
+        studentService.close();
+        teacherService.close();
+        subjectService.close();
     }
 
 }

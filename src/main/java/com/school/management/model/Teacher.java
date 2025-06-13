@@ -16,6 +16,10 @@ public class Teacher {
 
     private List<Subject> subjectList = new ArrayList<>();
 
+    public Teacher() {
+
+    }
+
     public List<Subject> getSubjectsList() {return subjectList;}
 
     public void addSubjects(Subject subject) {subjectList.add(subject);

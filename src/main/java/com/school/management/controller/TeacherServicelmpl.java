@@ -266,4 +266,15 @@ public class TeacherServicelmpl implements TeacherService{
             throw new RuntimeException("Error deleting teacher: " + e.getMessage(), e);
         }
     }
+
+    public void close() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+                System.out.println("SubjectService connection closed.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Failed to close SubjectService connection: " + e.getMessage());
+        }
+    }
 }

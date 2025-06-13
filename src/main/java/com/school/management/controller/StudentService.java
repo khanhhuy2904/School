@@ -15,4 +15,5 @@ public interface StudentService {
     void edit(Student student);
 
     void deleteByCode(String code);
+    void close();
 }
