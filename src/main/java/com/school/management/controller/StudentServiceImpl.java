@@ -1,5 +1,6 @@
 package com.school.management.controller;
 
+import com.school.management.DBUtil;
 import com.school.management.constant.Constants;
 import com.school.management.exceptions.StudentDuplicateException;
 import com.school.management.exceptions.StudentNotFoundException;
@@ -11,23 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StudentServiceImpl implements StudentService {
-    private Connection connection;
-    public StudentServiceImpl() {
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/school_management", "root", "Huynguyen29");
-        } catch (SQLException e) {
-            throw new RuntimeException("Connection failed: " + e.getMessage());
-        }
-//        } finally {
-//            try {
-//                if (connection != null && !connection.isClosed()) {
-//                    connection.close();
-//                }
-//            } catch (Exception ex) {
-//                System.out.println("⚠ Error closing connection: " + ex.getMessage());
-//            }
-//        }
-    }
 
     @Override
     public List<Student> getAll() {
@@ -35,7 +19,8 @@ public class StudentServiceImpl implements StudentService {
         String sql = "SELECT s.code, s.name, s.gender, s.birth_date, m.name AS major_name\n" +
                 "        FROM students s\n" +
                 "        LEFT JOIN majors m ON s.major_id = m.major_id";
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
@@ -65,7 +50,8 @@ public class StudentServiceImpl implements StudentService {
                 "WHERE s.code = ?";
 
         try (
-                PreparedStatement stmt = connection.prepareStatement(sql)
+                Connection conn = DBUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
 
         ) {
             stmt.setString(1, code);
@@ -94,13 +80,14 @@ public class StudentServiceImpl implements StudentService {
         String sql = "INSERT INTO students (code, name, gender, birth_date, major_id) VALUES (?, ?, ?, ?, ?)";
 
         try (
-                PreparedStatement stmt = connection.prepareStatement(sql)
+                Connection conn = DBUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
         ) {
             stmt.setString(1, student.getCodeStudent());
             stmt.setString(2, student.getNameStudent());
             stmt.setString(3, student.getGender());
             stmt.setDate(4, Date.valueOf(student.getBirthDay()));
-            stmt.setInt(5, getMajorIdByName(student.getMajor(), connection));
+            stmt.setInt(5, getMajorIdByName(student.getMajor()));
 
             int rows = stmt.executeUpdate();
             if (rows > 0) {
@@ -111,9 +98,10 @@ public class StudentServiceImpl implements StudentService {
             throw new RuntimeException("Error inserting student: " + e.getMessage(), e);
         }
     }
-    private int getMajorIdByName(String majorName, Connection conn) throws SQLException {
+    private int getMajorIdByName(String majorName) throws SQLException {
         String sql = "SELECT major_id FROM majors WHERE name = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, majorName);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -129,12 +117,13 @@ public class StudentServiceImpl implements StudentService {
         String sql = "UPDATE students SET name = ?, gender = ?, birth_date = ?, major_id = ? WHERE code = ?";
 
         try (
-                PreparedStatement stmt = connection.prepareStatement(sql)
+                Connection conn = DBUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
         ) {
             stmt.setString(1, student.getNameStudent());
             stmt.setString(2, student.getGender());
             stmt.setDate(3, Date.valueOf(student.getBirthDay()));
-            stmt.setInt(4, getMajorIdByName(student.getMajor(), connection));
+            stmt.setInt(4, getMajorIdByName(student.getMajor()));
             stmt.setString(5, student.getCodeStudent());
 
             int rows = stmt.executeUpdate();
@@ -154,7 +143,8 @@ public class StudentServiceImpl implements StudentService {
         String sql = "DELETE FROM students WHERE code = ?";
 
         try (
-                PreparedStatement stmt = connection.prepareStatement(sql)
+                Connection conn = DBUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
         ) {
             stmt.setString(1, code);
             int rows = stmt.executeUpdate();
@@ -167,17 +157,6 @@ public class StudentServiceImpl implements StudentService {
 
         } catch (SQLException e) {
             throw new RuntimeException("Error deleting student: " + e.getMessage(), e);
-        }
-    }
-
-    public void close() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-                System.out.println("SubjectService connection closed.");
-            }
-        } catch (SQLException e) {
-            System.out.println("Failed to close SubjectService connection: " + e.getMessage());
         }
     }
 }

@@ -14,5 +14,5 @@ public interface TeacherService {
     void edit(Teacher teacher);
 
     void deleteByCode(String code);
-    void close();
+
 }

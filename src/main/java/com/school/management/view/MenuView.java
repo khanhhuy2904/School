@@ -1,5 +1,6 @@
 package com.school.management.view;
 
+import com.school.management.DBUtil;
 import com.school.management.constant.Constants;
 import com.school.management.controller.*;
 import com.school.management.model.Student;
@@ -273,9 +274,6 @@ public class MenuView {
                 default:
             }
         }
-        studentService.close();
-        teacherService.close();
-        subjectService.close();
+        DBUtil.closePool();
     }
-
 }

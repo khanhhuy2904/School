@@ -1,5 +1,6 @@
 package com.school.management.controller;
 
+import com.school.management.DBUtil;
 import com.school.management.constant.Constants;
 import com.school.management.exceptions.SubjectDuplicateException;
 import com.school.management.exceptions.SubjectModificationException;
@@ -13,23 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SubjectServicelmpl implements SubjectService {
-    private Connection connection;
-    public SubjectServicelmpl() {
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/school_management", "root", "Huynguyen29");
-        } catch (SQLException e) {
-            throw new RuntimeException("Connection failed: " + e.getMessage());
-        }
-//        } finally {
-//            try {
-//                if (connection != null && !connection.isClosed()) {
-//                    connection.close();
-//                }
-//            } catch (Exception ex) {
-//                System.out.println("⚠ Error closing connection: " + ex.getMessage());
-//            }
-//        }
-    }
     @Override
     public List<Subject> getAll() {
         List<Subject> subjects = new ArrayList<>();
@@ -40,7 +24,8 @@ public class SubjectServicelmpl implements SubjectService {
 
         try (
 
-                PreparedStatement stmt = connection.prepareStatement(sql);
+                Connection conn = DBUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
                 ResultSet rs = stmt.executeQuery()
         ) {
             while (rs.next()) {
@@ -77,7 +62,8 @@ public class SubjectServicelmpl implements SubjectService {
                 "WHERE s.code = ?";
 
         try (
-                PreparedStatement stmt = connection.prepareStatement(sql)
+                Connection conn = DBUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
         ) {
             stmt.setString(1, code);
             ResultSet rs = stmt.executeQuery();
@@ -114,7 +100,8 @@ public class SubjectServicelmpl implements SubjectService {
         String sql = "INSERT INTO subjects (code, name, credit, max_students) VALUES (?, ?, ?, ?)";
 
         try (
-                PreparedStatement stmt = connection.prepareStatement(sql)
+                Connection conn = DBUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
         ) {
             stmt.setString(1, subject.getCodeSubject());
             stmt.setString(2, subject.getNameSubject());
@@ -138,7 +125,8 @@ public class SubjectServicelmpl implements SubjectService {
         try {
             // 1. Kiểm tra nếu môn học đã có giáo viên
             String checkTeacherSql = "SELECT teacher_id FROM subjects WHERE code = ? AND teacher_id IS NOT NULL";
-            try (PreparedStatement checkTeacherStmt = connection.prepareStatement(checkTeacherSql)) {
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement checkTeacherStmt = conn.prepareStatement(checkTeacherSql)) {
                 checkTeacherStmt.setString(1, subject.getCodeSubject());
                 ResultSet rs = checkTeacherStmt.executeQuery();
                 if (rs.next()) {
@@ -150,7 +138,8 @@ public class SubjectServicelmpl implements SubjectService {
             String checkStudentSql = "SELECT COUNT(*) AS total FROM student_subjects ss " +
                     "JOIN subjects s ON ss.subject_id = s.subject_id " +
                     "WHERE s.code = ?";
-            try (PreparedStatement checkStudentStmt = connection.prepareStatement(checkStudentSql)) {
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement checkStudentStmt = conn.prepareStatement(checkStudentSql)) {
                 checkStudentStmt.setString(1, subject.getCodeSubject());
                 ResultSet rs = checkStudentStmt.executeQuery();
                 if (rs.next() && rs.getInt("total") > 0) {
@@ -160,7 +149,8 @@ public class SubjectServicelmpl implements SubjectService {
 
             // 3. Cập nhật
             String updateSql = "UPDATE subjects SET name = ?, credit = ?, max_students = ? WHERE code = ?";
-            try (PreparedStatement updateStmt = connection.prepareStatement(updateSql)) {
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
                 updateStmt.setString(1, subject.getNameSubject());
                 updateStmt.setInt(2, subject.getCredit());
                 updateStmt.setInt(3, subject.getMaxStudent());
@@ -184,7 +174,8 @@ public class SubjectServicelmpl implements SubjectService {
         try {
             // 1. Kiểm tra nếu môn học đã có giáo viên
             String checkTeacherSql = "SELECT teacher_id FROM subjects WHERE code = ? AND teacher_id IS NOT NULL";
-            try (PreparedStatement checkTeacherStmt = connection.prepareStatement(checkTeacherSql)) {
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement checkTeacherStmt = conn.prepareStatement(checkTeacherSql)) {
                 checkTeacherStmt.setString(1, code);
                 ResultSet rs = checkTeacherStmt.executeQuery();
                 if (rs.next()) {
@@ -196,7 +187,8 @@ public class SubjectServicelmpl implements SubjectService {
             String checkStudentSql = "SELECT COUNT(*) AS total FROM student_subjects ss " +
                     "JOIN subjects s ON ss.subject_id = s.subject_id " +
                     "WHERE s.code = ?";
-            try (PreparedStatement checkStudentStmt = connection.prepareStatement(checkStudentSql)) {
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement checkStudentStmt = conn.prepareStatement(checkStudentSql)) {
                 checkStudentStmt.setString(1, code);
                 ResultSet rs = checkStudentStmt.executeQuery();
                 if (rs.next() && rs.getInt("total") > 0) {
@@ -206,7 +198,8 @@ public class SubjectServicelmpl implements SubjectService {
 
             // 3. Xóa môn học
             String deleteSql = "DELETE FROM subjects WHERE code = ?";
-            try (PreparedStatement deleteStmt = connection.prepareStatement(deleteSql)) {
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement deleteStmt = conn.prepareStatement(deleteSql)) {
                 deleteStmt.setString(1, code);
                 int rows = deleteStmt.executeUpdate();
                 if (rows > 0) {
@@ -226,7 +219,8 @@ public class SubjectServicelmpl implements SubjectService {
             // 1. Lấy teacher_id
             String getTeacherIdSql = "SELECT teacher_id FROM teachers WHERE code = ?";
             long teacherId;
-            try (PreparedStatement stmt = connection.prepareStatement(getTeacherIdSql)) {
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(getTeacherIdSql)) {
                 stmt.setString(1, teacherCode);
                 ResultSet rs = stmt.executeQuery();
                 if (!rs.next()) throw new TeacherNotFoundException("Teacher not found.");
@@ -235,7 +229,8 @@ public class SubjectServicelmpl implements SubjectService {
 
             // 2. Kiểm tra số lượng môn giáo viên đang dạy
             String countSql = "SELECT COUNT(*) FROM subjects WHERE teacher_id = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(countSql)) {
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(countSql)) {
                 stmt.setLong(1, teacherId);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next() && rs.getInt(1) >= 3) {
@@ -246,7 +241,8 @@ public class SubjectServicelmpl implements SubjectService {
             // 3. Lấy subject_id
             String getSubjectIdSql = "SELECT subject_id FROM subjects WHERE code = ?";
             long subjectId;
-            try (PreparedStatement stmt = connection.prepareStatement(getSubjectIdSql)) {
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(getSubjectIdSql)) {
                 stmt.setString(1, subjectCode);
                 ResultSet rs = stmt.executeQuery();
                 if (!rs.next()) throw new SubjectNotFoundException("Subject not found.");
@@ -255,7 +251,8 @@ public class SubjectServicelmpl implements SubjectService {
 
             // 4. Gán giáo viên cho môn học
             String updateSql = "UPDATE subjects SET teacher_id = ? WHERE subject_id = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(updateSql)) {
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(updateSql)) {
                 stmt.setLong(1, teacherId);
                 stmt.setLong(2, subjectId);
                 int rows = stmt.executeUpdate();
@@ -278,7 +275,8 @@ public class SubjectServicelmpl implements SubjectService {
             long subjectId;
             int maxStudents;
             int subjectCredit;
-            try (PreparedStatement stmt = connection.prepareStatement(subjectSql)) {
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(subjectSql)) {
                 stmt.setString(1, subjectCode);
                 ResultSet rs = stmt.executeQuery();
                 if (!rs.next()) throw new SubjectNotFoundException("Subject not found.");
@@ -289,7 +287,8 @@ public class SubjectServicelmpl implements SubjectService {
 
             // 2. Kiểm tra số sinh viên hiện tại trong môn học
             String countSql = "SELECT COUNT(*) FROM student_subjects WHERE subject_id = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(countSql)) {
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(countSql)) {
                 stmt.setLong(1, subjectId);
                 ResultSet rs = stmt.executeQuery();
                 rs.next();
@@ -305,10 +304,10 @@ public class SubjectServicelmpl implements SubjectService {
             String totalCreditSql = "SELECT SUM(s.credit) FROM student_subjects ss JOIN subjects s ON ss.subject_id = s.subject_id WHERE ss.student_id = ?";
             String insertSql = "INSERT INTO student_subjects (student_id, subject_id) VALUES (?, ?)";
 
-            try (
-                    PreparedStatement getStudentIdStmt = connection.prepareStatement(getStudentIdSql);
-                    PreparedStatement totalCreditStmt = connection.prepareStatement(totalCreditSql);
-                    PreparedStatement insertStmt = connection.prepareStatement(insertSql)
+            try (   Connection conn = DBUtil.getConnection();
+                    PreparedStatement getStudentIdStmt = conn.prepareStatement(getStudentIdSql);
+                    PreparedStatement totalCreditStmt = conn.prepareStatement(totalCreditSql);
+                    PreparedStatement insertStmt = conn.prepareStatement(insertSql)
             ) {
                 for (String studentCode : studentCodes) {
                     // 3.1 Lấy student_id
@@ -346,14 +345,5 @@ public class SubjectServicelmpl implements SubjectService {
         }
     }
 
-    public void close() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-                System.out.println("SubjectService connection closed.");
-            }
-        } catch (SQLException e) {
-            System.out.println("Failed to close SubjectService connection: " + e.getMessage());
-        }
-    }
+
 }

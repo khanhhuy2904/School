@@ -1,5 +1,6 @@
 package com.school.management.controller;
 
+import com.school.management.DBUtil;
 import com.school.management.constant.Constants;
 import com.school.management.exceptions.TeacherDuplicateException;
 import com.school.management.exceptions.TeacherNotFoundException;
@@ -10,31 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TeacherServicelmpl implements TeacherService{
-    private Connection connection;
-    public TeacherServicelmpl() {
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/school_management", "root", "Huynguyen29");
-        } catch (SQLException e) {
-            throw new RuntimeException("Connection failed: " + e.getMessage());
-        }
-//        } finally {
-//            try {
-//                if (connection != null && !connection.isClosed()) {
-//                    connection.close();
-//                }
-//            } catch (Exception ex) {
-//                System.out.println("⚠ Error closing connection: " + ex.getMessage());
-//            }
-//        }
-    }
+
     @Override
     public List<Teacher> getAll() {
         List<Teacher> teachers = new ArrayList<>();
         String sql = "SELECT code, name, gender, birth_date, experience_years FROM teachers";
 
-        try (
-                PreparedStatement stmt = connection.prepareStatement(sql);
-                ResultSet rs = stmt.executeQuery()
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()
         ) {
             while (rs.next()) {
                 Teacher teacher = new Teacher(
@@ -65,8 +50,8 @@ public class TeacherServicelmpl implements TeacherService{
                 "LEFT JOIN majors m ON tm.major_id = m.major_id " +
                 "WHERE t.code = ?";
 
-        try (
-                PreparedStatement stmt = connection.prepareStatement(sql)
+        try (   Connection conn = DBUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
         ) {
             stmt.setString(1, code);
             ResultSet rs = stmt.executeQuery();
@@ -114,8 +99,8 @@ public class TeacherServicelmpl implements TeacherService{
     public void create(Teacher teacher) {
         String insertTeacherSql = "INSERT INTO teachers (code, name, gender, birth_date, experience_years) VALUES (?, ?, ?, ?, ?)";
 
-        try (
-                PreparedStatement insertTeacherStmt = connection.prepareStatement(insertTeacherSql, Statement.RETURN_GENERATED_KEYS)
+        try (   Connection conn = DBUtil.getConnection();
+                PreparedStatement insertTeacherStmt = conn.prepareStatement(insertTeacherSql, Statement.RETURN_GENERATED_KEYS)
         ) {
             // 1. Insert teacher
             insertTeacherStmt.setString(1, teacher.getCodeTeacher());
@@ -136,9 +121,10 @@ public class TeacherServicelmpl implements TeacherService{
 
             // 3. Insert teacher_majors
             String insertMajorSql = "INSERT INTO teacher_major (teacher_id, major_id) VALUES (?, ?)";
-            try (PreparedStatement majorStmt = connection.prepareStatement(insertMajorSql)) {
+            try (
+                 PreparedStatement majorStmt = conn.prepareStatement(insertMajorSql)) {
                 for (String majorName : teacher.getMajor()) {
-                    int majorId = getMajorIdByName(majorName, connection);
+                    int majorId = getMajorIdByName(majorName, conn);
                     majorStmt.setLong(1, teacherId);
                     majorStmt.setInt(2, majorId);
                     majorStmt.addBatch();
@@ -148,9 +134,10 @@ public class TeacherServicelmpl implements TeacherService{
 
             // 4. Insert teacher_ranks
             String insertRankSql = "INSERT INTO teacher_rank (teacher_id, rank_id) VALUES (?, ?)";
-            try (PreparedStatement rankStmt = connection.prepareStatement(insertRankSql)) {
+            try (
+                 PreparedStatement rankStmt = conn.prepareStatement(insertRankSql)) {
                 for (String rankName : teacher.getLevel()) {
-                    int rankId = getRankIdByName(rankName, connection);
+                    int rankId = getRankIdByName(rankName, conn);
                     rankStmt.setLong(1, teacherId);
                     rankStmt.setInt(2, rankId);
                     rankStmt.addBatch();
@@ -189,9 +176,9 @@ public class TeacherServicelmpl implements TeacherService{
         String updateSql = "UPDATE teachers SET name = ?, gender = ?, birth_date = ?, experience_years = ? WHERE code = ?";
         String selectIdSql = "SELECT teacher_id FROM teachers WHERE code = ?";
 
-        try (
-                PreparedStatement updateStmt = connection.prepareStatement(updateSql);
-                PreparedStatement idStmt = connection.prepareStatement(selectIdSql)
+        try (   Connection conn = DBUtil.getConnection();
+                PreparedStatement updateStmt = conn.prepareStatement(updateSql);
+                PreparedStatement idStmt = conn.prepareStatement(selectIdSql)
         ) {
             // 1. Lấy teacher_id từ code
             idStmt.setString(1, teacher.getCodeTeacher());
@@ -210,16 +197,18 @@ public class TeacherServicelmpl implements TeacherService{
             updateStmt.executeUpdate();
 
             // 3. Xóa majors/ranks cũ
-            try (Statement stmt = connection.createStatement()) {
+            try (
+                 Statement stmt = conn.createStatement()) {
                 stmt.executeUpdate("DELETE FROM teacher_major WHERE teacher_id = " + teacherId);
                 stmt.executeUpdate("DELETE FROM teacher_rank WHERE teacher_id = " + teacherId);
             }
 
             // 4. Chèn majors mới
             String insertMajorSql = "INSERT INTO teacher_major (teacher_id, major_id) VALUES (?, ?)";
-            try (PreparedStatement majorStmt = connection.prepareStatement(insertMajorSql)) {
+            try (
+                 PreparedStatement majorStmt = conn.prepareStatement(insertMajorSql)) {
                 for (String majorName : teacher.getMajor()) {
-                    int majorId = getMajorIdByName(majorName, connection);
+                    int majorId = getMajorIdByName(majorName, conn);
                     majorStmt.setLong(1, teacherId);
                     majorStmt.setInt(2, majorId);
                     majorStmt.addBatch();
@@ -229,9 +218,9 @@ public class TeacherServicelmpl implements TeacherService{
 
             // 5. Chèn ranks mới
             String insertRankSql = "INSERT INTO teacher_rank (teacher_id, rank_id) VALUES (?, ?)";
-            try (PreparedStatement rankStmt = connection.prepareStatement(insertRankSql)) {
+            try (PreparedStatement rankStmt = conn.prepareStatement(insertRankSql)) {
                 for (String rankName : teacher.getLevel()) {
-                    int rankId = getRankIdByName(rankName, connection);
+                    int rankId = getRankIdByName(rankName, conn);
                     rankStmt.setLong(1, teacherId);
                     rankStmt.setInt(2, rankId);
                     rankStmt.addBatch();
@@ -250,8 +239,8 @@ public class TeacherServicelmpl implements TeacherService{
     public void deleteByCode(String code) {
         String sql = "DELETE FROM teachers WHERE code = ?";
 
-        try (
-                PreparedStatement stmt = connection.prepareStatement(sql)
+        try (   Connection conn = DBUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
         ) {
             stmt.setString(1, code);
             int rows = stmt.executeUpdate();
@@ -264,17 +253,6 @@ public class TeacherServicelmpl implements TeacherService{
 
         } catch (SQLException e) {
             throw new RuntimeException("Error deleting teacher: " + e.getMessage(), e);
-        }
-    }
-
-    public void close() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-                System.out.println("SubjectService connection closed.");
-            }
-        } catch (SQLException e) {
-            System.out.println("Failed to close SubjectService connection: " + e.getMessage());
         }
     }
 }
