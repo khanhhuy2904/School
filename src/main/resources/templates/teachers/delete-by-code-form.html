@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Delete Teacher</title>
+</head>
+<body>
+<h2>Delete Teacher By Code</h2>
+
+<form th:action="@{/teachers/delete-by-code}" method="post">
+    <label for="code">Enter Teacher Code:</label>
+    <input type="text" id="code" name="code" required />
+    <button type="submit">Delete</button>
+</form>
+
+<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
+<a th:href="@{/teachers}">Back to Teacher List</a>
+</body>
+</html>

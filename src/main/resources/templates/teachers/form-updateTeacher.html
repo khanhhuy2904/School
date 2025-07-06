@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Teacher</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h2>Edit Teacher</h2>
+<form th:action="@{/teachers/update}" th:object="${teacher}" method="post">
+
+    <input type="hidden" th:field="*{teacherId}" />
+    <label>Code:</label>
+    <input type="text" th:field="*{code}" readonly /><br>
+
+    <label>Name:</label>
+    <input type="text" th:field="*{name}" required /><br>
+
+    <label>Gender:</label>
+    <input type="text" th:field="*{gender}" required /><br>
+
+    <label>Birth Date:</label>
+    <input type="date" th:field="*{birthDay}" required /><br>
+
+    <label>Experience (Years):</label>
+    <input type="number" th:field="*{experienceYears}" required /><br>
+
+    <label>Majors:</label>
+    <select multiple th:field="*{majors}">
+        <option th:each="m : ${majors}"
+                th:value="${m.majorId}"
+                th:text="${m.name}"
+                th:selected="${#lists.contains(teacher.majors, m)}"></option>
+    </select><br/>
+
+    <label>Ranks:</label>
+    <select multiple th:field="*{ranks}">
+        <option th:each="r : ${ranks}"
+                th:value="${r.rankId}"
+                th:text="${r.name}"
+                th:selected="${#lists.contains(teacher.ranks, r)}"></option>
+    </select><br/>
+
+
+    <button type="submit">Update</button>
+</form>
+
+<a th:href="@{/teachers}">Back to list</a>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Delete Subject</title>
+</head>
+<body>
+
+<h2>Delete Subject</h2>
+
+<form th:action="@{/subjects/delete-by-code}" method="post">
+  <label>Enter Subject Code:</label>
+  <input type="text" name="code" required/>
+  <button type="submit">Delete</button>
+</form>
+
+<div th:if="${error}" th:text="${error}" style="color:red;"></div>
+<div th:if="${message}" th:text="${message}" style="color:green;"></div>
+
+<a th:href="@{/subjects}">Back to List</a>
+
+</body>
+</html>

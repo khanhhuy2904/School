@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Find Teacher by Code</title></head>
+<body>
+<h2>Edit Teacher by Code</h2>
+<form th:action="@{/teachers/edit-by-code}" method="post">
+    <label>Teacher Code:</label>
+    <input type="text" name="code" required>
+    <button type="submit">Search</button>
+</form>
+
+<p th:if="${error}" th:text="${error}" style="color:red;"></p>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Edit Subject By Code</title>
+</head>
+<body>
+
+<h2>Edit Subject</h2>
+
+<form th:action="@{/subjects/edit-by-code}" method="post">
+  <label>Enter Subject Code:</label>
+  <input type="text" name="code" required/>
+  <button type="submit">Load Subject</button>
+</form>
+
+<div th:if="${error}" th:text="${error}" style="color:red;"></div>
+
+<a th:href="@{/subjects}">Back to List</a>
+
+</body>
+</html>

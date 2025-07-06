@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Student</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h2>Edit Student</h2>
+<form th:action="@{/students/update}" th:object="${student}" method="post">
+
+    <input type="hidden" th:field="*{studentId}" />
+    <label>Code:</label>
+    <input type="text" th:field="*{code}" readonly /><br>
+
+    <label>Name:</label>
+    <input type="text" th:field="*{name}" required /><br>
+
+    <label>Gender:</label>
+    <input type="text" th:field="*{gender}" required /><br>
+
+    <label>Birth Date:</label>
+    <input type="date" th:field="*{birthDay}" required /><br>
+
+    <label>Major:</label>
+    <select th:field="*{major}" required>
+        <option th:each="m : ${majors}" th:value="${m.majorId}" th:text="${m.name}"
+                th:selected="${m.majorId == student.major?.majorId}">
+        </option>
+    </select><br>
+
+    <button type="submit">Update</button>
+</form>
+
+<a th:href="@{/students}">Back to list</a>
+</body>
+</html>

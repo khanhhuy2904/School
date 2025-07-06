@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Subject List</title>
+</head>
+<body>
+<h2>Subject List</h2>
+
+<td><a th:href="@{/subjects/new}">New</a></td>
+<td><a th:href="@{/subjects/edit-by-code}">Edit</a></td>
+<td><a th:href="@{/subjects/delete-form}">Delete</a></td>
+
+<table border="1">
+  <tr>
+    <th>ID</th><th>Code</th><th>Name</th><th>Credit</th><th>MaxStudent</th>
+  </tr>
+  <tr th:each="subject : ${subjects}">
+    <td th:text="${subject.subjectId}"></td>
+    <td th:text="${subject.code}"></td>
+    <td th:text="${subject.name}"></td>
+    <td th:text="${subject.credit}"></td>
+    <td th:text="${subject.maxStudents}"></td>
+
+  </tr>
+</table>
+</body>
+</html>
