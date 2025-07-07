@@ -47,7 +47,13 @@ public class SubjectServiceImpl implements SubjectService {
         existing.setName(updated.getName());
         existing.setCredit(updated.getCredit());
         existing.setMaxStudents(updated.getMaxStudents());
+//        existing.setTeacher(updated.getTeacher());
         return subjectRepository.save(existing);
+    }
+
+    @Override
+    public Subject save(Subject subject) {
+        return subjectRepository.save(subject);
     }
 }
 

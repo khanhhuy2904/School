@@ -11,5 +11,6 @@ public interface SubjectService {
     void deleteByCode(String code);
     Subject findByCode(String code);
     Subject update(Subject subject);
+    Subject save(Subject subject);
 }
 

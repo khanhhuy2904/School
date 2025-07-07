@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Teacher to Subject</title>
+</head>
+<body>
+<h2>Add Teacher to Subject</h2>
+
+<form th:action="@{/subjects/add-teacher}" method="post">
+    <label>Teacher Code:</label>
+    <input type="text" name="teacherCode" required><br>
+
+    <label>Subject Code:</label>
+    <input type="text" name="subjectCode" required><br>
+
+    <button type="submit">Add Teacher</button>
+</form>
+
+<p th:if="${error}" th:text="${error}" style="color:red"></p>
+<p th:if="${success}" th:text="${success}" style="color:green"></p>
+
+</body>
+</html>

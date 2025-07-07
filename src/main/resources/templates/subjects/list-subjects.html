@@ -9,19 +9,38 @@
 <td><a th:href="@{/subjects/new}">New</a></td>
 <td><a th:href="@{/subjects/edit-by-code}">Edit</a></td>
 <td><a th:href="@{/subjects/delete-form}">Delete</a></td>
+<td><a th:href="@{/subjects/add-teacher-form}">Add Teacher</a></td>
+<td><a th:href="@{/subjects/add-students}">Add Students</a></td>
+
+
 
 <table border="1">
+  <thead>
   <tr>
-    <th>ID</th><th>Code</th><th>Name</th><th>Credit</th><th>MaxStudent</th>
+    <th>ID</th>
+    <th>Code</th>
+    <th>Name</th>
+    <th>Credit</th>
+    <th>MaxStudent</th>
+    <th>Teacher</th>
   </tr>
+  </thead>
+  <tbody>
   <tr th:each="subject : ${subjects}">
     <td th:text="${subject.subjectId}"></td>
     <td th:text="${subject.code}"></td>
     <td th:text="${subject.name}"></td>
     <td th:text="${subject.credit}"></td>
     <td th:text="${subject.maxStudents}"></td>
-
+    <td>
+      <span th:if="${subject.teacher != null}"
+            th:text="${subject.teacher.code + ' - ' + subject.teacher.name}"></span>
+      <span th:if="${subject.teacher == null}">N/A</span>
+    </td>
   </tr>
+  </tbody>
 </table>
+<a th:href="@{/}" style="margin-top: 20px; display: inline-block;">Back to Home</a>
+
 </body>
 </html>

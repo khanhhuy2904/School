@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Subject Enrollment Result</title>
+</head>
+<body>
+<h2>Subject Enrollment Result</h2>
+
+<!-- Subject Info -->
+<h3>Subject Info</h3>
+<table border="1">
+  <tr>
+    <th>Code</th>
+    <th>Name</th>
+  </tr>
+  <tr>
+    <td th:text="${subject.code}"></td>
+    <td th:text="${subject.name}"></td>
+  </tr>
+</table>
+
+<!-- All Enrolled Students (including previously existing and newly added) -->
+<h3>All Enrolled Students</h3>
+<table border="1">
+  <thead>
+  <tr>
+    <th>Code</th>
+    <th>Name</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="student : ${subject.students}">
+    <td th:text="${student.code}"></td>
+    <td th:text="${student.name}"></td>
+  </tr>
+  </tbody>
+</table>
+
+<a th:href="@{/subjects}">Back to Subject List</a>
+
+</body>
+</html>
