@@ -14,15 +14,19 @@
 
     <label>Name:</label>
     <input type="text" th:field="*{name}" required /><br>
+    <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 
     <label>Gender:</label>
     <input type="text" th:field="*{gender}" required /><br>
+    <div th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
 
     <label>Birth Date:</label>
     <input type="date" th:field="*{birthDay}" required /><br>
+    <div th:if="${#fields.hasErrors('birthDay')}" th:errors="*{birthDay}"></div>
 
     <label>Experience (Years):</label>
     <input type="number" th:field="*{experienceYears}" required /><br>
+    <div th:if="${#fields.hasErrors('experienceYears')}" th:errors="*{experienceYears}"></div>
 
     <label>Majors:</label>
     <select multiple th:field="*{majors}">
@@ -31,6 +35,7 @@
                 th:text="${m.name}"
                 th:selected="${#lists.contains(teacher.majors, m)}"></option>
     </select><br/>
+    <div th:if="${#fields.hasErrors('majors')}" th:errors="*{majors}"></div>
 
     <label>Ranks:</label>
     <select multiple th:field="*{ranks}">
@@ -39,6 +44,7 @@
                 th:text="${r.name}"
                 th:selected="${#lists.contains(teacher.ranks, r)}"></option>
     </select><br/>
+    <div th:if="${#fields.hasErrors('ranks')}" th:errors="*{ranks}"></div>
 
 
     <button type="submit">Update</button>

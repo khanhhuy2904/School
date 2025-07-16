@@ -10,8 +10,10 @@ import com.example.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -41,16 +43,26 @@ public class TeacherController {
     }
 
     @PostMapping("/save")
-    public String saveTeacher(@ModelAttribute Teacher teacher,
+    public String saveTeacher(@ModelAttribute("teacher") @Valid Teacher teacher,
+                              BindingResult bindingResult,
                               @RequestParam List<Long> selectedMajors,
-                              @RequestParam List<Long> selectedRanks) {
+                              @RequestParam List<Long> selectedRanks,
+                              Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("allMajors", majorService.findAll());
+            model.addAttribute("allRanks", rankService.findAll());
+            return "teachers/form-teacher";
+        }
+
         List<Major> majors = majorService.findByMajorIdIn(selectedMajors);
         List<Rank> ranks = rankService.findByRankIdIn(selectedRanks);
         teacher.setMajors(majors);
         teacher.setRanks(ranks);
+
         teacherService.generateAndSaveTeacher(teacher);
         return "redirect:/teachers";
     }
+
 
     @GetMapping("/edit-by-code")
     public String showEditTeacherByCodeForm() {
@@ -73,10 +85,26 @@ public class TeacherController {
     }
 
     @PostMapping("/update")
-    public String updateTeacher(@ModelAttribute("teacher") Teacher teacher) {
+    public String updateTeacher(@ModelAttribute("teacher") @Valid Teacher teacher,
+                                BindingResult bindingResult,
+                                @RequestParam List<Long> selectedMajors,
+                                @RequestParam List<Long> selectedRanks,
+                                Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("majors", majorService.findAll());
+            model.addAttribute("ranks", rankService.findAll());
+            return "teachers/form-updateTeacher";
+        }
+
+        List<Major> majors = majorService.findByMajorIdIn(selectedMajors);
+        List<Rank> ranks = rankService.findByRankIdIn(selectedRanks);
+        teacher.setMajors(majors);
+        teacher.setRanks(ranks);
+
         teacherService.update(teacher);
         return "redirect:/teachers";
     }
+
 
     @GetMapping("/delete-form")
     public String showDeleteForm() {

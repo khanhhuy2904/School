@@ -6,27 +6,33 @@
 </head>
 <body>
 <h2>Edit Student</h2>
+
 <form th:action="@{/students/update}" th:object="${student}" method="post">
 
     <input type="hidden" th:field="*{studentId}" />
+
     <label>Code:</label>
     <input type="text" th:field="*{code}" readonly /><br>
+    <div th:if="${#fields.hasErrors('code')}" th:errors="*{code}"></div>
 
     <label>Name:</label>
     <input type="text" th:field="*{name}" required /><br>
+    <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 
     <label>Gender:</label>
     <input type="text" th:field="*{gender}" required /><br>
+    <div th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
 
     <label>Birth Date:</label>
     <input type="date" th:field="*{birthDay}" required /><br>
+    <div th:if="${#fields.hasErrors('birthDay')}" th:errors="*{birthDay}"></div>
 
     <label>Major:</label>
     <select th:field="*{major}" required>
-        <option th:each="m : ${majors}" th:value="${m.majorId}" th:text="${m.name}"
-                th:selected="${m.majorId == student.major?.majorId}">
-        </option>
+        <option value="">-- Select Major --</option>
+        <option th:each="m : ${majors}" th:value="${m.majorId}" th:text="${m.name}"></option>
     </select><br>
+    <div th:if="${#fields.hasErrors('major')}" th:errors="*{major}"></div>
 
     <button type="submit">Update</button>
 </form>

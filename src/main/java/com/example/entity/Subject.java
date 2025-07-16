@@ -1,6 +1,9 @@
 package com.example.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
@@ -15,10 +18,15 @@ public class Subject {
     @Column(unique = true)
     private String code;
 
+    @NotBlank(message = "Name is required")
+    @Column(name = "name")
     private String name;
 
+    @Min(value = 1, message = "Credit must be at least 1")
+    @Column(name = "credit")
     private int credit;
 
+    @Min(value = 1, message = "Max students must be at least 1")
     @Column(name = "max_students")
     private int maxStudents;
 

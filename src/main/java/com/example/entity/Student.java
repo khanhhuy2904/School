@@ -3,6 +3,8 @@ package com.example.entity;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -12,19 +14,25 @@ public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "student_id") // trong database
-    private Long studentId; // java
+    @Column(name = "student_id")
+    private Long studentId;
 
+    @NotBlank(message = "Name is required")
     @Column(name = "name")
     private String name;
-    @Column(name = "code")
+
+    @Column(unique = true)
     private String code;
+
+    @NotBlank(message = "Gender is required")
     @Column(name = "gender")
     private String gender;
 
+    @NotNull(message = "Birth date is required")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "birth_date")
     private LocalDate birthDay;
+
     @ManyToMany
     @JoinTable(
             name = "student_subjects",
@@ -33,6 +41,7 @@ public class Student {
     )
     private List<Subject> subjects;
 
+    @NotNull(message = "Major is required")
     @ManyToOne
     @JoinColumn(name = "major_id")
     private Major major;

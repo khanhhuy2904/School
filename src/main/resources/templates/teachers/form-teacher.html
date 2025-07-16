@@ -8,27 +8,35 @@
 <form th:action="@{/teachers/save}" th:object="${teacher}" method="post">
     <label>Name:</label>
     <input type="text" th:field="*{name}" /><br/>
+    <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 
     <label>Gender:</label>
     <input type="text" th:field="*{gender}" /><br/>
+    <div th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
 
     <label>Birthday:</label>
     <input type="date" th:field="*{birthDay}" /><br/>
+    <div th:if="${#fields.hasErrors('birthDay')}" th:errors="*{birthDay}"></div>
 
     <label>Experience Years:</label>
     <input type="number" th:field="*{experienceYears}" /><br/>
+    <div th:if="${#fields.hasErrors('experienceYears')}" th:errors="*{experienceYears}"></div>
 
     <label>Majors:</label>
     <select name="selectedMajors" multiple>
         <option th:each="m : ${allMajors}" th:value="${m.majorId}" th:text="${m.name}"></option>
     </select>
+    <div th:if="${#fields.hasErrors('majors')}" th:errors="*{majors}"></div>
 
     <label>Ranks:</label>
     <select name="selectedRanks" multiple>
         <option th:each="r : ${allRanks}" th:value="${r.rankId}" th:text="${r.name}"></option>
     </select>
+    <div th:if="${#fields.hasErrors('ranks')}" th:errors="*{ranks}"></div>
 
     <button type="submit">Save</button>
 </form>
+<a th:href="@{/teachers}">Back to list</a>
+
 </body>
 </html>

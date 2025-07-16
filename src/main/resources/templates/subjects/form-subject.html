@@ -12,12 +12,15 @@
 
   <label>Name:</label>
   <input type="text" th:field="*{name}" required/><br/>
+  <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 
   <label>Credit:</label>
   <input type="number" th:field="*{credit}" min="1" required/><br/>
+  <div th:if="${#fields.hasErrors('credit')}" th:errors="*{credit}"></div>
 
   <label>Max Students:</label>
   <input type="number" th:field="*{maxStudents}" min="1" required/><br/>
+  <div th:if="${#fields.hasErrors('maxStudents')}" th:errors="*{maxStudents}"></div>
 
   <button type="submit">Save</button>
 </form>

@@ -6,9 +6,11 @@ import com.example.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -35,35 +37,50 @@ public class StudentController {
     }
 
     @PostMapping("/save")
-    public String saveStudent(@ModelAttribute("student") Student student) {
+    public String saveStudent(@Valid @ModelAttribute("student") Student student,
+                              BindingResult bindingResult,
+                              Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("majors", majorService.findAll());
+            return "students/form-student";
+        }
+
         studentService.generateAndSaveStudent(student);
         return "redirect:/students";
     }
 
-        @GetMapping("/edit-by-code")
-        public String showEditByCodeForm() {
+    @GetMapping("/edit-by-code")
+    public String showEditByCodeForm() {
+        return "students/edit-by-code-form";
+    }
+
+
+    @PostMapping("/edit-by-code")
+    public String loadStudentForEdit(@RequestParam("code") String code, Model model) {
+        Student student = studentService.findByCode(code);
+        if (student == null) {
+            model.addAttribute("error", "Student not found");
             return "students/edit-by-code-form";
         }
+        model.addAttribute("student", student);
+        model.addAttribute("majors", majorService.findAll());
+        return "students/form-updateStudent";
+    }
 
 
-        @PostMapping("/edit-by-code")
-        public String loadStudentForEdit(@RequestParam("code") String code, Model model) {
-            Student student = studentService.findByCode(code);
-            if (student == null) {
-                model.addAttribute("error", "Student not found");
-                return "students/edit-by-code-form";
-            }
-            model.addAttribute("student", student);
+    @PostMapping("/update")
+    public String updateStudent(@Valid @ModelAttribute("student") Student student,
+                                BindingResult bindingResult,
+                                Model model) {
+        if (bindingResult.hasErrors()) {
             model.addAttribute("majors", majorService.findAll());
             return "students/form-updateStudent";
         }
 
-
-        @PostMapping("/update")
-        public String updateStudent(@ModelAttribute("student") Student student) {
-            studentService.update(student);
-            return "redirect:/students";
+        studentService.update(student);
+        return "redirect:/students";
     }
+
 
     @GetMapping("/delete-form")
     public String showDeleteForm() {

@@ -3,6 +3,9 @@ package com.example.entity;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,23 +17,28 @@ public class Teacher {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "teacher_id")
     private Long teacherId;
+
+    @NotBlank(message = "Name is required")
     @Column(name = "name")
     private String name;
 
     @Column(unique = true)
     private String code;
+
+    @NotBlank(message = "Gender is required")
     @Column(name = "gender")
     private String gender;
 
+    @NotNull(message = "Birth date is required")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "birth_date")
     private LocalDate birthDay;
 
+    @Min(value = 0, message = "Experience years must be >= 0")
     @Column(name = "experience_years")
     private int experienceYears;
 
-    // Many-to-many with ranks
-    @ManyToMany
+    @NotNull(message = "Rank is required")    @ManyToMany
     @JoinTable(
             name = "teacher_rank",
             joinColumns = @JoinColumn(name = "teacher_id"),
@@ -38,8 +46,7 @@ public class Teacher {
     )
     private List<Rank> ranks;
 
-    // Many-to-many with majors
-    @ManyToMany
+    @NotNull(message = "Major is required")    @ManyToMany
     @JoinTable(
             name = "teacher_major",
             joinColumns = @JoinColumn(name = "teacher_id"),

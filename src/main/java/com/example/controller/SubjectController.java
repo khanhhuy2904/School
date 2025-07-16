@@ -9,8 +9,10 @@ import com.example.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,10 +42,15 @@ public class SubjectController {
     }
 
     @PostMapping("/save")
-    public String saveSubject(@ModelAttribute Subject subject) {
+    public String saveSubject(@ModelAttribute("subject") @Valid Subject subject,
+                              BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            return "subjects/form-subject";
+        }
         subjectService.generateAndSaveSubject(subject);
         return "redirect:/subjects";
     }
+
 
     @GetMapping("/edit-by-code")
     public String showEditByCodeForm() {
@@ -62,10 +69,15 @@ public class SubjectController {
     }
 
     @PostMapping("/update")
-    public String updateSubject(@ModelAttribute Subject subject) {
+    public String updateSubject(@ModelAttribute("subject") @Valid Subject subject,
+                                BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            return "subjects/form-updateSubject";
+        }
         subjectService.update(subject);
         return "redirect:/subjects";
     }
+
 
     @GetMapping("/delete-form")
     public String showDeleteForm() {

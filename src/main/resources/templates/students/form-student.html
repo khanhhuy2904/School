@@ -9,20 +9,30 @@
 <form th:action="@{/students/save}" th:object="${student}" method="post">
     <label>Name:</label>
     <input type="text" th:field="*{name}" required><br>
+    <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 
     <label>Gender:</label>
     <input type="text" th:field="*{gender}" required><br>
+    <div th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
 
     <label>Birth Date:</label>
     <input type="date" th:field="*{birthDay}" required /><br>
+    <div th:if="${#fields.hasErrors('birthDay')}" th:errors="*{birthDay}"></div>
 
     <select th:field="*{major}">
         <option th:each="m : ${majors}" th:value="${m.majorId}" th:text="${m.name}"></option>
     </select>
-
+    <div th:if="${#fields.hasErrors('major')}" th:errors="*{major}"></div>
+    <br>
     <button type="submit">Save</button>
 </form>
 
 <a th:href="@{/students}">Back to list</a>
 </body>
 </html>
+
+
+
+
+
+
